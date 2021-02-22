@@ -1,4 +1,5 @@
 import numpy as np
+import math
 import launch_Parameters as Params
 
 
@@ -17,6 +18,7 @@ class Decide:
         return
 
     def compute_cmv(self):
+        self.cmv[0] = self.lic_0()
         return
 
     def compute_pum(self):
@@ -27,7 +29,19 @@ class Decide:
 
     # Return TRUE if two consecutive data points are a distance greater than the length1 apart, else return FALSE
     def lic_0(self):
-        return
+
+        for i in range(0, self.points.length - 1):
+
+            # Calculate the distance between point p1 and p2
+            p1 = self.points[i]
+            p2 = self.points[i+1]
+            distance = math.sqrt(math.pow(p2.x - p1.x, 2) + math.pow(p2.y - p1.y, 2))
+
+            # Check if the distance is greater than length1 in the parameters
+            if distance > self.parameters.length1:
+                return 1
+
+        return 0
 
     def lic_1(self):
         return
