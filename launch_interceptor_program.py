@@ -1,8 +1,9 @@
 import numpy as np
+import launch_Parameters as Params
 
 
 class Decide:
-    def __init__(self, num_points, points, parameters, lcm, puv):
+    def __init__(self, num_points, points, parameters: Params.Parameters, lcm, puv):
         self.num_points = num_points
         self.points = points
         self.parameters = parameters
@@ -24,6 +25,7 @@ class Decide:
     def compute_fuv(self):
         return
 
+    # Return TRUE if two consecutive data points are a distance greater than the length1 apart, else return FALSE
     def lic_0(self):
         return
 
