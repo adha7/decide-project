@@ -25,7 +25,10 @@ class Decide:
         self.cmv[1] = self.lic_1()
         self.cmv[2] = self.lic_2()
         self.cmv[3] = self.lic_3()
-        return
+        self.cmv[4] = self.lic_4()
+        self.cmv[5] = self.lic_5()
+        self.cmv[6] = self.lic_6()
+        self.cmv[7] = self.lic_7()
 
     def compute_pum(self):
         return
@@ -91,7 +94,7 @@ class Decide:
             vector1 = (p1.x - p2.x, p1.y - p2.y)
             vector2 = (p3.x - p2.x, p3.y - p2.y)
 
-            dotProduct = vector1[0]*vector2[0].x + vector1[1]*vector2[1]
+            dotProduct = vector1[0] * vector2[0].x + vector1[1] * vector2[1]
             vector1Len = math.sqrt(math.pow(vector1[0], 2) + math.pow(vector1[1], 2))
             vector2Len = math.sqrt(math.pow(vector2[0], 2) + math.pow(vector2[1], 2))
 
@@ -120,30 +123,112 @@ class Decide:
             p3 = self.points[i+2]
 
             # Calculate the sides of the triangle
-            length1 = math.sqrt(math.pow(p1.x-p2.x, 2)+math.pow(p1.y-p2.y, 2))
-            length2 = math.sqrt(math.pow(p1.x-p3.x, 2)+math.pow(p1.y-p3.y, 2))
-            length3 = math.sqrt(math.pow(p2.x-p3.x, 2)+math.pow(p2.y-p3.y, 2))
+            length1 = math.sqrt(math.pow(p1.x - p2.x, 2) + math.pow(p1.y - p2.y, 2))
+            length2 = math.sqrt(math.pow(p1.x - p3.x, 2) + math.pow(p1.y - p3.y, 2))
+            length3 = math.sqrt(math.pow(p2.x - p3.x, 2) + math.pow(p2.y - p3.y, 2))
 
             # Calculate the area of the triangle using Heron's formula
-            tmp = (length1+length2+length3)/2
-            area = math.sqrt(tmp*(tmp-length1)*(tmp-length2)*(tmp-length3))
+            tmp = (length1 + length2 + length3) / 2
+            area = math.sqrt(tmp * (tmp - length1) * (tmp - length2) * (tmp - length3))
 
             if area > self.parameters.area1:
                 return 1
 
         return 0
 
+    # Return TRUE if there exists at least one set of Q_PTS consecutive data points that lie in more than QUADS
+    # quadrants.                       2 <= Q_PTS <= NUMPOINTS, 1 <= QUADS <= 3
     def lic_4(self):
-        return
 
+        # Check the boundaries
+        if self.parameters.q_pts > self.num_points or self.parameters.q_pts < 2:
+            return 0
+
+        # Check the boundaries
+        if self.parameters.q_uads > 3 or self.parameters.q_uads < 1:
+            return 0
+
+        # Iterate over all sets of qPts consecutive points
+        for i in range(0, self.num_points - self.parameters.q_pts + 1):
+
+            cons_points = []
+            # Iterate q_pts steps to gather the set
+            for j in range(i, self.parameters.q_pts + i):
+                cons_points.append(self.points[j])
+
+            # Keep track of visited quadrants
+            num_quads = np.array(4, bool)
+
+            for count, point in enumerate(cons_points):
+                if point.x >= 0:
+                    if point.y >= 0:
+                        num_quads[0] = 1
+                    elif point.x == 0 and point.y < 0:
+                        num_quads[2] = 1
+                    else:
+                        num_quads[3] = 1
+
+                else:
+                    if point.y >= 0:
+                        num_quads[1] = 1
+                    else:
+                        num_quads[2] = 1
+
+            # Check if the set of q_pts consecutive points lie in more than q_uads quadrants
+            if sum(num_quads) > self.parameters.q_uads:
+                return 1
+
+        return 0
+
+    # Return TRUE if there exists at least one set of two consecutive data points where X[j] - X[i] < 0 (where i=j-1)
     def lic_5(self):
-        return
 
+        # Iterate over all sets of two consecutive points
+        for i in range(0, self.points.length - 1):
+            p1 = self.points[i]
+            p2 = self.points[i+1]
+
+            if (p2.x - p1.x) < 0:
+                return 1
+
+        return 0
+
+    # Return TRUE if there exists at least one set of N PTS consecutive data points such that at least one of the points
+    # lies a distance greater than DIST from the line joining the first and last of these N PTS points
+    # When NUMPOINTS < 3, the condition is not met
     def lic_6(self):
-        return
 
+        if self.num_points < 3:
+            return 0
+
+        # Iterate over all sets of n_pts consecutive points
+        for i in range(0, self.num_points - self.parameters.n_pts + 1):
+
+            cons_points = []
+            # Iterate n_pts steps to gather the set
+            for j in range(i, self.parameters.n_pts + i):
+                cons_points.append(self.points[j])
+
+        return 0
+
+    # Return TRUE if there exists at least one set of two data points separated by exactly K PTS consecutive intervening
+    # points that are a distance greater than the length, LENGTH1, apart
     def lic_7(self):
-        return
+
+        if self.num_points < 3:
+            return 0
+
+        for i in range(0, self.num_points - 1 - self.parameters.k_pts):
+            p1 = self.points[i]
+            p2 = self.points[i + 1 + self.parameters.k_pts]
+
+            # Calculate the distance between the two points
+            distance = math.sqrt(math.pow(p2.x - p1.x, 2) + math.pow(p2.y - p1.y, 2))
+
+            if distance > self.parameters.length1:
+                return 1
+
+        return 0
 
     def lic_8(self):
         return
