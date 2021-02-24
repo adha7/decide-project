@@ -1,13 +1,14 @@
 import numpy as np
 import math
 import launch_Parameters as Params
+import Connector as Con
 
 # Constants
 PI = 3.14159265359
 
 
 class Decide:
-    def __init__(self, num_points, points, parameters: Params.Parameters, lcm, puv):
+    def __init__(self, num_points, points, parameters: Params.Parameters, lcm: Con.Connector, puv):
         self.num_points = num_points
         self.points = points
         self.parameters = parameters
@@ -18,7 +19,10 @@ class Decide:
         self.fuv = np.array(15, bool)        # The Final Unlocking Vector (FUV), a 15-element vector.
 
     def launch_decision(self):
-        return
+        for count, value in enumerate(self.fuv):
+            if not value:
+                return 0
+        return 1
 
     def compute_cmv(self):
         self.cmv[0] = self.lic_0()
@@ -29,15 +33,33 @@ class Decide:
         self.cmv[5] = self.lic_5()
         self.cmv[6] = self.lic_6()
         self.cmv[7] = self.lic_7()
+        self.cmv[8] = self.lic_8()
+        self.cmv[9] = self.lic_9()
+        self.cmv[10] = self.lic_10()
+        self.cmv[11] = self.lic_11()
+        self.cmv[12] = self.lic_12()
+        self.cmv[13] = self.lic_13()
+        self.cmv[14] = self.lic_14()
 
     def compute_pum(self):
-        return
+        for i in range(0, 15):
+            for j in range(0, 15):
+                if self.lcm[i][j] == Con.Connector.ANDD:
+                    self.pum[i][j] = self.cmv[i] and self.cmv[j]
+                elif self.lcm[i][j] == Con.Connector.ORR:
+                    self.pum[i][j] = self.cmv[i] or self.cmv[j]
+                else:
+                    self.pum[i][j] = 1
 
     def compute_fuv(self):
         return
 
     # Return TRUE if two consecutive data points are a distance greater than the length1 apart
     def lic_0(self):
+
+        # Check the boundaries
+        if self.parameters.length1 < 0:
+            return 0
 
         for i in range(0, self.points.length - 1):
 
@@ -55,6 +77,7 @@ class Decide:
     # Return TRUE if three consecutive data points are not contained within or on a circle of radius1
     def lic_1(self):
 
+        # Check the boundaries
         if self.parameters.radius1 < 0:
             return 0
 
@@ -82,6 +105,10 @@ class Decide:
 
     # Return TRUE if three consecutive points form an angle greater than PI+epsilon or less than PI-epsilon
     def lic_2(self):
+
+        # Check the boundaries
+        if self.parameters.epsilon < 0 or self.parameters.epsilon >= PI:
+            return 0
 
         # Iterate over all sets of three consecutive points
         for i in range(0, self.points.length - 2):
@@ -114,6 +141,10 @@ class Decide:
     # Return TRUE if there exists a set of three consecutive points that are the vertices of a triangle with area
     # greater than parameters.area1
     def lic_3(self):
+
+        # Check the boundaries
+        if self.parameters.area1 < 0:
+            return 0
 
         # Iterate over all sets of three consecutive points
         for i in range(0, self.points.length - 2):
@@ -198,7 +229,11 @@ class Decide:
     # When NUMPOINTS < 3, the condition is not met
     def lic_6(self):
 
+        # Check the boundaries
         if self.num_points < 3:
+            return 0
+
+        if self.parameters.n_pts > self.num_points or self.parameters.n_pts < 3 or self.parameters.dist < 0:
             return 0
 
         # Iterate over all sets of n_pts consecutive points
@@ -209,13 +244,33 @@ class Decide:
             for j in range(i, self.parameters.n_pts + i):
                 cons_points.append(self.points[j])
 
+            p1 = cons_points[0]
+            pn = cons_points[self.parameters.n_pts - 1]
+
+            # Check if the first and last point of these N PTS are identical
+            if p1.x == pn.x and p1.y == pn.y:
+                for k in range(1, self.parameters.n_pts - 1):
+                    pk = cons_points[k]
+                    distance = math.sqrt(math.pow(pk.y - p1.y, 2) + math.pow(pk.x - p1.x, 2))
+                    if distance > self.parameters.dist:
+                        return 1
+            else:
+                for k in range(1, self.parameters.n_pts - 1):
+                    pk = cons_points[k]
+                    num = abs((pn.y - p1.y) * pk.x - (pn.x - p1.x) * pk.y + pn.x * p1.y - pn.y * p1.x)
+                    den = math.sqrt(math.pow(pn.y - p1.y, 2) + math.pow(pn.x - p1.x, 2))
+                    distance = num / den
+
+                    if distance > self.parameters.dist:
+                        return 1
         return 0
 
     # Return TRUE if there exists at least one set of two data points separated by exactly K PTS consecutive intervening
     # points that are a distance greater than the length, LENGTH1, apart
     def lic_7(self):
 
-        if self.num_points < 3:
+        # Check the boundaries
+        if self.num_points < 3 or self.parameters.k_pts > self.num_points - 2 or self.parameters.k_pts < 1:
             return 0
 
         for i in range(0, self.num_points - 1 - self.parameters.k_pts):
@@ -231,22 +286,22 @@ class Decide:
         return 0
 
     def lic_8(self):
-        return
+        return 1
 
     def lic_9(self):
-        return
+        return 1
 
     def lic_10(self):
-        return
+        return 1
 
     def lic_11(self):
-        return
+        return 1
 
     def lic_12(self):
-        return
+        return 1
 
     def lic_13(self):
-        return
+        return 1
 
     def lic_14(self):
-        return
+        return 1
