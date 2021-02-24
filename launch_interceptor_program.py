@@ -22,6 +22,7 @@ class Decide:
         for count, value in enumerate(self.fuv):
             if not value:
                 return 0
+            
         return 1
 
     def compute_cmv(self):
