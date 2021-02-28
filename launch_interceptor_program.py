@@ -383,8 +383,21 @@ class Decide:
 
         return 0
 
+    # Return TRUE if there is at least one set of two data points separated by exactly
+    # G_PTS consecutive intervening points, such that X[j] - X[i] < 0.
+
     def lic_11(self):
-        return 1
+        if self.num_points < 3 or self.parameters.g_pts < 1 or self.num_points - 2 < 1:
+            return 0
+
+        for i in range(self.num_points - self.parameters.g_pts - 1):
+            Point2D p1 = points[i]
+            Point2D p2 = points[i + self.parameters.g_pts + 1]
+
+            if p2.x -p1.x < 0:
+                return 1
+
+        return 0
 
     def lic_12(self):
         return 1
