@@ -424,8 +424,11 @@ class Decide:
 
             if dist < self.parameters.length2:
                 flag2 = 1
+            
+            if flag1 and flag2:
+                return 1
 
-        return flag1 and flag2
+        return 0
 
     # Return TRUE if there is at least one set of three data points separated by exactly
     # A_PTS and B_PTS consecutive intervening points, respectively, that cannot be 
@@ -434,7 +437,27 @@ class Decide:
     # respectively, that can be contained in or on a circle of radius RADIUS2.
 
     def lic_13(self):
-        return 1
+        if num_points < 5 or self.parameters.radius2 < 0:
+            return 0 
+
+        flag1 = 0
+        flag2 = 0
+
+        for i in range(self.num_points - self.parameters.a_pts - self.parameters.b_pts - 2):
+            Point2D p1 = self.points[i]
+            Point2D p2 = self.points[i + self.parameters.a_pts + 1]
+            Point2D p3 = self.points[i + self.parameters.a_pts + self.parameters.b_pts + 2]
+
+            if not withinCircle(p1,p2,p3,self.parameters.radius1):
+                flag1 = 1
+
+            if not withinCircle(p1,p2,p3,self.parameters.radius2):
+                flag2 = 1
+                
+            if flag1 and flag2:
+                return 1
+
+        return 0
 
     def lic_14(self):
         return 1
