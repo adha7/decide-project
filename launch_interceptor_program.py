@@ -2,13 +2,14 @@ import numpy as np
 import math
 import launch_Parameters as Params
 import Connector as Con
+import Point2D
 
 # Constants
 PI = 3.14159265359
 
 
 class Decide:
-    def __init__(self, num_points, points, parameters: Params.Parameters, lcm: Con.Connector, puv):
+    def __init__(self, num_points, points: Point2D, parameters: Params.Parameters, lcm: Con.Connector, puv):
         self.num_points = num_points
         self.points = points
         self.parameters = parameters
@@ -286,8 +287,31 @@ class Decide:
 
         return 0
 
+
+    # Return TRUE if there is at least one set of three data points separated by exactly
+    # A_PTS and B_PTS consecutive intervening points, respectively, that cannot be contained
+    # within or on a circle of radius RADIUS1.
     def lic_8(self):
-        return 1
+        # Exceptional condition in case # of points are greater than 5
+        if self.num_points < 5 or self.parameters.a_pts < 1 or self.parameters.b_pts < 1:
+            return 0
+
+        if self.parameters.a_pts + self.parameters.b_pts > num_points -3:
+            return 0
+        
+        if self.parameters.radius1 < 0
+            return 0
+
+        for i in range(self.num_points - self.parameters.a_pts - self.parameters.b_pts - 2):
+            Point2D p1 = self.points[i]
+            Point2D p2 = self.points[i + self.parameters.a_pts + 1]
+            Point2D p3 = self.points[i + self.parameters.a_pts + self.parameters.b_pts + 2]
+            pointsInCircleFlag = withinCircle(p1, p2, p3, self.parameters.radius1)
+
+            if not pointsInCircleFlag:
+                return 1
+
+        return 0
 
     def lic_9(self):
         return 1
@@ -306,3 +330,29 @@ class Decide:
 
     def lic_14(self):
         return 1
+
+    # Helper functions
+    def withinCircle(p1: Point2D, p2: Point2D, p3: Point2D, r):
+        dist12 = np.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2)
+        dist23 = np.sqrt((p2.x - p3.x)**2 + (p2.y - p3.y)**2)
+        dist31 = np.sqrt((p3.x - p1.x)**2 + (p3.y - p1.y)**2)
+
+        # If all the points are in a line return true
+        if (p1.y - p2.y)*(p1.x - p3.x) == (p1.y - p3.y)*(p1.x - p2.x):
+            if (dist12 <= r) and (dist31 <= r) and (dist23 <= r):
+                return 1
+
+        # Calculating the radius if the circumcircle
+        numerator  = dist12 * dist23 * dist31
+        denomenator = (dist12 + dist31 + dist23) * (- dist12 + dist23 + dist31 ) * (dist12 - dist23 + dist31) * (dist12 + dist23 - dist31)
+        # Making sure that the denominator is not zero
+        if denomenator == 0:
+            return 0
+        r_circum = numerator / np.sqrt(denomenator)
+        # Checking if a point is inside or on the circle with radius1
+        if (r_circum <= r):
+            return 1
+        
+        return 0
+        
+
