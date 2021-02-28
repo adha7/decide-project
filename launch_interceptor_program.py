@@ -323,8 +323,6 @@ class Decide:
         if self.parameters.c_pts + self.parameters.d_pts > num_points -3:
             return 0
         
-        if self.parameters.radius1 < 0
-            return 0
 
         for i in range(self.num_points - self.parameters.c_pts - self.parameters.d_pts - 2):
             Point2D p1 = self.points[i]
@@ -355,8 +353,35 @@ class Decide:
     # vertices of a triange with area greater than AREA1. 
 
     def lic_10(self):
+        if self.num_points < 5 or self.parameters.e_pts < 1 or self.parameters.f_pts < 1:
+            return 0
 
-        return 1
+        if self.parameters.e_pts + self.parameters.f_pts > num_points -3:
+            return 0
+        
+        for i in range(self.num_points - self.parameters.e_pts - self.parameters.f_pts - 2):
+            Point2D p1 = self.points[i]
+            Point2D p2 = self.points[i + self.parameters.e_pts + 1]
+            Point2D p3 = self.points[i + self.parameters.e_pts + self.parameters.f_pts + 2]
+            
+            # Finding the vectors to create an triangle
+            Point2D v1 = Point2D(p1.x - p2.x, p1.y - p2.y)
+            Point2D v2 = Point2D(p3.x - p1.x, p3.y - p1.y)
+            Point2D v3 = Point2D(p2.x - p3.x, p2.y - p3.y)
+
+            # Calculating the length of sides of the triangle
+            v1Len = math.sqrt(math.pow(v1.x, 2) + math.pow(v1.y, 2))
+            v2Len = math.sqrt(math.pow(v2.x, 2) + math.pow(v2.y, 2))
+            v3Len = math.sqrt(math.pow(v3.x, 2) + math.pow(v3.y, 2))
+            
+            # Calculating the are of the triangle 
+            semi_perimeter = (v1len + v2len + v3len)/2
+            area = math.sqrt(semi_perimeter*(semi_perimeter - v1len)*(semi_perimeter - v2len)*(semi_perimeter - v3len))
+
+            if area > self.parameters.area1:
+                return 1
+
+        return 0
 
     def lic_11(self):
         return 1
