@@ -406,7 +406,7 @@ class Decide:
     # length, LENGTH2, apart.
 
     def lic_12(self):
-        if num_points < 3:
+        if num_points < 3 or self.parameters.length2 < 0:
             return 0
         
         flag1 = 0
@@ -426,6 +426,12 @@ class Decide:
                 flag2 = 1
 
         return flag1 and flag2
+
+    # Return TRUE if there is at least one set of three data points separated by exactly
+    # A_PTS and B_PTS consecutive intervening points, respectively, that cannot be 
+    # contained within or on a circle of radius RADIUS1 and if there is at least one set of  
+    # three data points separated by exactly A_PTS and B_PTS consecutive intervening points,
+    # respectively, that can be contained in or on a circle of radius RADIUS2.
 
     def lic_13(self):
         return 1
