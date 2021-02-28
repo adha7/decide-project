@@ -320,7 +320,7 @@ class Decide:
         if self.num_points < 5 or self.parameters.c_pts < 1 or self.parameters.d_pts < 1:
             return 0
 
-        if self.parameters.a_pts + self.parameters.b_pts > num_points -3:
+        if self.parameters.c_pts + self.parameters.d_pts > num_points -3:
             return 0
         
         if self.parameters.radius1 < 0
@@ -350,7 +350,12 @@ class Decide:
 
         return 0    
 
+    # Return TRUE if there is at least one set of three data points separated by exactly
+    # E_PTS and F_PTS consecutive intervening points, respectively, that they are the 
+    # vertices of a triange with area greater than AREA1. 
+
     def lic_10(self):
+
         return 1
 
     def lic_11(self):
