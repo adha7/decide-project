@@ -453,14 +453,49 @@ class Decide:
 
             if not withinCircle(p1,p2,p3,self.parameters.radius2):
                 flag2 = 1
-                
+
             if flag1 and flag2:
                 return 1
 
         return 0
 
+    # Return TRUE if there is at least one set of three data points separated by exactly
+    # E PTS and F PTS consecutive intervening points, respectively, that are the vertices
+    # of a triangle with area greater than AREA1 and if there is at least one set of  
+    # three data points separated by exactly E PTS and F PTS consecutive intervening points,
+    # respectively, that are the vertices of a triangle with area less than AREA2. 
+
     def lic_14(self):
-        return 1
+        if num_points < 5 or self.parameters.area2 < 0:
+            return 0 
+
+        flag1 = 0
+        flag2 = 0
+
+        for i in range(self.num_points - self.parameters.e_pts - self.parameters.f_pts - 2):
+            Point2D p1 = self.points[i]
+            Point2D p2 = self.points[i + self.parameters.e_pts + 1]
+            Point2D p3 = self.points[i + self.parameters.e_pts + self.parameters.f_pts + 2]
+
+            # Calculating the length of sides of the triangle
+            v1Len = math.sqrt(math.pow(p1.x - p2.x, 2) + math.pow(p1.y - p2.y, 2))
+            v2Len = math.sqrt(math.pow(p1.x - p3.x, 2) + math.pow(p1.y - p3.y, 2))
+            v3Len = math.sqrt(math.pow(p2.x - p3.x, 2) + math.pow(p2.y - p3.y, 2))
+
+            # Calculating the are of the triangle 
+            semi_perimeter = (v1len + v2len + v3len)/2
+            area = math.sqrt(semi_perimeter*(semi_perimeter - v1len)*(semi_perimeter - v2len)*(semi_perimeter - v3len))
+
+            if area > self.parameters.area1:
+                flag1 = 1
+
+            if area < self.parameters.area2:
+                flag2 = 1
+
+            if flag1 and flag2:
+                return 1
+
+        return 0
 
     # Helper functions
     def withinCircle(p1: Point2D, p2: Point2D, p3: Point2D, r):
