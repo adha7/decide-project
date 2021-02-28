@@ -313,8 +313,42 @@ class Decide:
 
         return 0
 
+    
+    # Return TRUE if there is at least one set of three data points separated by exactly
+    # C_PTS and D_PTS consecutive intervening points, respectively, that form an angle
     def lic_9(self):
-        return 1
+        if self.num_points < 5 or self.parameters.c_pts < 1 or self.parameters.d_pts < 1:
+            return 0
+
+        if self.parameters.a_pts + self.parameters.b_pts > num_points -3:
+            return 0
+        
+        if self.parameters.radius1 < 0
+            return 0
+
+        for i in range(self.num_points - self.parameters.c_pts - self.parameters.d_pts - 2):
+            Point2D p1 = self.points[i]
+            Point2D p2 = self.points[i + self.parameters.c_pts + 1]
+            Point2D p3 = self.points[i + self.parameters.c_pts + self.parameters.d_pts + 2]
+            
+            # Taking point 2 as vertex, finding the vectors to create an angle
+            Point2D v1 = Point2D(p1.x - p2.x, p1.y - p2.y)
+            Point2D v2 = Point2D(p3.x - p2.x, p3.y - p2.y)
+
+            # The cosine of the angle between two vectors is equal to the dot product
+            # of this vectors divided by the product of vector magnitude.
+            v1Len = math.sqrt(math.pow(v1.x, 2) + math.pow(v1.y, 2))
+            v2Len = math.sqrt(math.pow(v2.x, 2) + math.pow(v2.y, 2))
+
+            if (v1len == 0) or (v2len == 0):
+                continue
+
+            angle = math.acos((v1.x * v2.x + v1.y * v2.y)/(v1len * v2len))
+
+            if angle < (PI - self.parameters.epsilon):
+                return 1
+
+        return 0    
 
     def lic_10(self):
         return 1
