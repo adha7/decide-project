@@ -399,8 +399,33 @@ class Decide:
 
         return 0
 
+    # Return TRUE if there is at least one set of two data points separated by exactly
+    # G_PTS consecutive intervening points, which are a distance greater than the length,
+    # LENGTH1, apart and if there is at least one set of two data points, separated by 
+    # exactly K_PTS consecutive intervening points, that are a distance less than the 
+    # length, LENGTH2, apart.
+
     def lic_12(self):
-        return 1
+        if num_points < 3:
+            return 0
+        
+        flag1 = 0
+        flag2 = 0
+
+        for i in range(self.num_points - self.parameters.k_pts - 1):
+            Point2D p1 = points[i]
+            Point2D p2 = points[i + self.parameters.k_pts + 1]
+
+            # Calculate the distance between two points
+            dist =  math.sqrt(math.pow(p2.x - p1.x, 2) + math.pow(p2.y - p1.y, 2))
+
+            if dist > self.parameters.length1:
+                flag1 = 1
+
+            if dist < self.parameters.length2:
+                flag2 = 1
+
+        return flag1 and flag2
 
     def lic_13(self):
         return 1
