@@ -54,7 +54,9 @@ class Decide:
                     self.pum[i][j] = 1
 
     def compute_fuv(self):
-        return
+        for i in range(0, 15):
+            if not(self.puv[i]) or sum(self.pum[i]) == len(self.pum[i]):
+                self.fuv[i] = True
 
     # Return TRUE if two consecutive data points are a distance greater than the length1 apart
     def lic_0(self):
