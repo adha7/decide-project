@@ -65,7 +65,7 @@ class Decide:
         if self.parameters.length1 < 0:
             return 0
 
-        for i in range(0, self.points.length - 1):
+        for i in range(0, len(self.points) - 1):
 
             # Calculate the distance between point p1 and p2
             p1 = self.points[i]
@@ -85,7 +85,7 @@ class Decide:
         if self.parameters.radius1 < 0:
             return 0
 
-        for i in range(0, self.points.length - 2):
+        for i in range(0, len(self.points) - 2):
 
             # Calculate the distance between points p1, p2 and p3
             p1 = self.points[i]
@@ -115,7 +115,7 @@ class Decide:
             return 0
 
         # Iterate over all sets of three consecutive points
-        for i in range(0, self.points.length - 2):
+        for i in range(0, len(self.points) - 2):
 
             p1 = self.points[i]
             p2 = self.points[i + 1]
@@ -151,7 +151,7 @@ class Decide:
             return 0
 
         # Iterate over all sets of three consecutive points
-        for i in range(0, self.points.length - 2):
+        for i in range(0, len(self.points) - 2):
 
             p1 = self.points[i]
             p2 = self.points[i + 1]
@@ -219,7 +219,7 @@ class Decide:
     def lic_5(self):
 
         # Iterate over all sets of two consecutive points
-        for i in range(0, self.points.length - 1):
+        for i in range(0, len(self.points) - 1):
             p1 = self.points[i]
             p2 = self.points[i + 1]
 
