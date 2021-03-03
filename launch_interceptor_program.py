@@ -5,7 +5,7 @@ import Connector as Con
 import Point2D
 
 # Constants
-PI = 3.14159265359
+PI = 3.14
 
 
 class Decide:
@@ -125,7 +125,7 @@ class Decide:
             vector1 = (p1.x - p2.x, p1.y - p2.y)
             vector2 = (p3.x - p2.x, p3.y - p2.y)
 
-            dotProduct = vector1[0] * vector2[0].x + vector1[1] * vector2[1]
+            dotProduct = vector1[0] * vector2[0] + vector1[1] * vector2[1]
             vector1Len = math.sqrt(math.pow(vector1[0], 2) + math.pow(vector1[1], 2))
             vector2Len = math.sqrt(math.pow(vector2[0], 2) + math.pow(vector2[1], 2))
 
