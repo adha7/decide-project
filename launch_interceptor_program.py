@@ -57,6 +57,8 @@ class Decide:
         for i in range(0, 15):
             if not(self.puv[i]) or sum(self.pum[i]) == len(self.pum[i]):
                 self.fuv[i] = True
+            else:
+                self.fuv[i] = False
 
     # Return TRUE if two consecutive data points are a distance greater than the length1 apart
     def lic_0(self):
@@ -192,7 +194,7 @@ class Decide:
                 cons_points.append(self.points[j])
 
             # Keep track of visited quadrants
-            num_quads = np.array(4, bool)
+            num_quads = [False, False, False, False]
 
             for count, point in enumerate(cons_points):
                 if point.x >= 0:

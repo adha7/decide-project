@@ -68,3 +68,50 @@ def test_lic2(epsilon, expected):
 
     interceptor_system.parameters.epsilon = epsilon
     assert interceptor_system.lic_2() == expected
+
+
+# TEST LIC3
+@pytest.mark.parametrize("area1,expected", [
+    # Testing if LIC3 returns FALSE if area1 is less than 0
+    (-2, 0),
+    # Testing if LIC3 returns TRUE if three consecutive points are the vertices of a triangle with area > 2
+    (2, 1),
+    # Testing if LIC3 returns FALSE if three consecutive points are the vertices of a triangle with area < 5
+    (5, 0),
+])
+# Return TRUE if there exists a set of three consecutive points that are the vertices of a triangle with area
+# greater than parameters.area1
+def test_lic3(area1, expected):
+    num_points = 5
+    points = [Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.0, 0.0), Point2D.Point2D(0.0, 0.0),
+              Point2D.Point2D(-3.0, 3.0), Point2D.Point2D(-3.0, 0.0)]
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+
+    interceptor_system.parameters.area1 = area1
+    assert interceptor_system.lic_3() == expected
+
+
+# TEST LIC4
+@pytest.mark.parametrize("q_pts,q_uads,expected", [
+    # Testing if LIC4 returns FALSE if two consecutive points do not lie in more than 2 quadrants
+    (2, 2, 0),
+    # Testing if LIC4 returns TRUE if three consecutive points lie in more than 2 quadrants
+    (3, 2, 1),
+    # Testing if LIC4 returns FALSE if q_pts is less than 2
+    (1, 3, 0),
+    # Testing if LIC4 returns FALSE if two consecutive points do not lie in more than 3 quadrants
+    (2, 3, 0),
+])
+# Return TRUE if there exists at least one set of Q_PTS consecutive data points that lie in more than QUADS
+# quadrants.                       2 <= Q_PTS <= NUMPOINTS, 1 <= QUADS <= 3
+def test_lic4(q_pts, q_uads, expected):
+    num_points = 4
+    points = [Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.0, -1.0), Point2D.Point2D(-1.0, 1.0),
+              Point2D.Point2D(-1.0, -1.0)]
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+
+    interceptor_system.parameters.q_pts = q_pts
+    interceptor_system.parameters.q_uads = q_uads
+    assert interceptor_system.lic_4() == expected
