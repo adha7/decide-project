@@ -184,3 +184,33 @@ def test_lic7(points, num_points, k_pts, length1, expected):
     interceptor_system.parameters.length1 = length1
     assert interceptor_system.lic_7() == expected
 
+
+# TEST COMPUTE CMV
+def test_compute_cmv():
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    num_points = 5
+    points = [Point2D.Point2D(0.0, 1.0), Point2D.Point2D(1.0, 0.0), Point2D.Point2D(2.0, 0.0),
+              Point2D.Point2D(3.0, 0.0), Point2D.Point2D(3.0, 4.0)]
+
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+
+    interceptor_system.parameters.radius2 = 10
+    interceptor_system.parameters.radius2 = 1.5
+    interceptor_system.parameters.nPTS = 5
+    interceptor_system.parameters.dist = 1.5
+    interceptor_system.parameters.area2 = 4
+    expected = [True, True, True, True, False, False, False, True, True, True, True, False, False, True, False]
+
+    # Testing if all cmv values are correctly set
+    interceptor_system.compute_cmv()
+    assert sum(interceptor_system.cmv) == sum(expected)
+
+
+# TEST DECIDE
+# Testing if Decide() returns TRUE if all values in FUV are true, false otherwise
+def test_decide():
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    interceptor_system = lip.Decide(0, None, parameters, Con.Connector.ANDD, None)
+    interceptor_system.fuv = [True, True, True, True, True, True, True, True, True, True, True, True, True, True, True]
+
+    assert interceptor_system.launch_decision()

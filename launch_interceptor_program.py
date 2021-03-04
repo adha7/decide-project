@@ -15,9 +15,9 @@ class Decide:
         self.parameters = parameters
         self.lcm = lcm
         self.puv = puv
-        self.cmv = np.array(15, bool)  # The Conditions Met Vector (CMV), a 15-element vector.
+        self.cmv = np.zeros(15)              # The Conditions Met Vector (CMV), a 15-element vector.
         self.pum = np.array([15, 15], bool)  # Preliminary Unlocking Matrix (PUM), a 15x15 matrix.
-        self.fuv = np.array(15, bool)  # The Final Unlocking Vector (FUV), a 15-element vector.
+        self.fuv = np.zeros(15)              # The Final Unlocking Vector (FUV), a 15-element vector.
 
     def launch_decision(self):
         for count, value in enumerate(self.fuv):
