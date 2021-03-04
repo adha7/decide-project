@@ -131,7 +131,56 @@ def test_lic4(q_pts, q_uads, expected):
 # Return TRUE if there exists at least one set of two consecutive data points where X[j] - X[i] < 0 (where i=j-1)
 def test_lic5(points, num_points, expected):
     parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
-    num_points = num_points
     interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
     assert interceptor_system.lic_5() == expected
+
+
+# TEST LIC6
+@pytest.mark.parametrize("points,num_points,n_pts,dist,expected", [
+    # Testing if LIC6 returns FALSE if there do not exist at least one point of the set of 2 consecutive data points
+    # that lie a distance greater than 1
+    ([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(0.0, 0.0)], 2, 1, 1, 0),
+    # Testing if LIC6 returns FALSE if there do not exist at least one point of the set of 3 consecutive data points
+    # that lie a distance greater than 3
+    ([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 2.0), Point2D.Point2D(3.0, 0.0)], 3, 3, 3, 0),
+    # Testing if LIC6 returns TRUE if there exist at least one point of the set of 3 consecutive data points that lie a
+    # distance greater than 0
+    ([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 2.0), Point2D.Point2D(3.0, 0.0)], 3, 3, 0, 1),
+    # Testing if LIC6 returns TRUE if there exist at least one point of the set of 3 consecutive data points that lie a
+    # distance greater than 1
+    ([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(2.0, 2.0), Point2D.Point2D(0.0, 0.0)], 3, 3, 1, 1),
+])
+# Return TRUE if there exists at least one set of N PTS consecutive data points such that at least one of the points
+# lies a distance greater than DIST from the line joining the first and last of these N PTS points
+# When NUMPOINTS < 3, the condition is not met
+def test_lic6(points, num_points, n_pts, dist, expected):
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+
+    interceptor_system.parameters.n_pts = n_pts
+    interceptor_system.parameters.dist = dist
+    assert interceptor_system.lic_6() == expected
+
+
+# TEST LIC7
+@pytest.mark.parametrize("points,num_points,k_pts,length1,expected", [
+    # Testing if LIC7 returns FALSE if there do not exist one set of two data points separated by exactly 1
+    # consecutive intervening points that are on a distance greater than 1
+    ([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 1.0)], 1, 1, 1, 0),
+    # Testing if LIC7 returns FALSE if there do not exist one set of two data points separated by exactly 1
+    # consecutive intervening points that are  on a distance greater than 2
+    ([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0), Point2D.Point2D(0.0, 1.0)], 3, 1, 2, 0),
+    # Testing if LIC7 returns TRUE if there exist one set of two data points separated by exactly 1
+    # consecutive intervening points that are  on a distance greater than 2
+    ([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(3.0, 0.0), Point2D.Point2D(5.0, 0.0)], 3, 1, 2, 1),
+])
+# Return TRUE if there exists at least one set of two data points separated by exactly K PTS consecutive intervening
+# points that are a distance greater than the length, LENGTH1, apart
+def test_lic7(points, num_points, k_pts, length1, expected):
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+
+    interceptor_system.parameters.k_pts = k_pts
+    interceptor_system.parameters.length1 = length1
+    assert interceptor_system.lic_7() == expected
 
