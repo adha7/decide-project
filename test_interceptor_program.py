@@ -115,3 +115,23 @@ def test_lic4(q_pts, q_uads, expected):
     interceptor_system.parameters.q_pts = q_pts
     interceptor_system.parameters.q_uads = q_uads
     assert interceptor_system.lic_4() == expected
+
+
+# TEST LIC5
+@pytest.mark.parametrize("points,num_points,expected", [
+    # Testing if LIC5 returns FALSE if there do not exists two consecutive data points where X[j] - X[i] < 0
+    ([Point2D.Point2D(0.0, 0.0)], 1, 0),
+    # Testing if LIC5 returns FALSE if there do not exists two consecutive data points where X[j] - X[i] < 0
+    ([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0)], 2, 0),
+    # Testing if LIC5 returns FALSE if there do not exists two consecutive data points where X[j] - X[i] < 0
+    ([Point2D.Point2D(0.0, 1.0), Point2D.Point2D(0.0, 1.0)], 2, 0),
+    # Testing if LIC5 returns TRUE if there exists two consecutive data points where X[j] - X[i] < 0
+    ([Point2D.Point2D(1.0, 0.0), Point2D.Point2D(0.0, 0.0)], 2, 1),
+])
+# Return TRUE if there exists at least one set of two consecutive data points where X[j] - X[i] < 0 (where i=j-1)
+def test_lic5(points, num_points, expected):
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    num_points = num_points
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+    assert interceptor_system.lic_5() == expected
+
