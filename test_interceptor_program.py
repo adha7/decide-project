@@ -232,8 +232,9 @@ def test_decide():
     # consecutive intervening points that cannot be contained within or on a circle of radius 0.5
     ([Point2D.Point2D(-1.0, 0.0), Point2D.Point2D(1.5, 0.5),Point2D.Point2D(1.5, -0.5), Point2D.Point2D(0.0, 1.0), Point2D.Point2D(-1.5, 0.5), Point2D.Point2D(1.0, 0.0)], 6, 2, 2, 0.5, 0),
 ])
-# Return TRUE if there exists at least one set of two data points separated by exactly K PTS consecutive intervening
-# points that are a distance greater than the length, LENGTH1, apart
+# Return TRUE if there is at least one set of three data points separated by exactly
+# A_PTS and B_PTS consecutive intervening points, respectively, that cannot be contained
+# within or on a circle of radius RADIUS1.
 def test_lic8(points, num_points, a_pts, b_pts, radius1, expected):
     parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
     interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
@@ -242,3 +243,32 @@ def test_lic8(points, num_points, a_pts, b_pts, radius1, expected):
     interceptor_system.parameters.b_pts = b_pts
     interceptor_system.parameters.radius1 = radius1
     assert interceptor_system.lic_8() == expected
+
+# TEST LIC9
+@pytest.mark.parametrize("points,num_points,c_pts,d_pts,epsilon,expected", [
+    ####################################  ANGLE IS LESS THAN PI - EPSILON  ###############################
+    # Tests if LIC9 returns TRUE if there exist one set of three data points separated by exactly 1 and 1
+    # consecutive intervening points , that form an angle such that forms an angle < (PI−1.5)
+    ([Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(0.0, 0.0), Point2D.Point2D(-1.0, 1.0), Point2D.Point2D(-1.5, -1.0), Point2D.Point2D(0.0, 1.5)], 6, 1, 1, 1.5, 1),
+    ####################################  ANGLE IS GREATER THAN PI - EPSILON ###########################
+    # Tests if LIC9 returns FALSE if there exist one set of three data points separated by exactly 2 and 1
+    # consecutive intervening points , that form an angle such that forms an angle > (PI−3.4)
+    ([Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(0.0, 0.0), Point2D.Point2D(-1.0, 1.0), Point2D.Point2D(-1.5, -1.0), Point2D.Point2D(0.0, 1.5)], 6, 2, 1, 3.4, 0),
+    ####################################  CORNER CONDITIONS/ EXCEPTIONS  ###########################################
+    # Tests if LIC9 returns FALSE if the number of points are less than 5
+    ([Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(0.0, 0.0)], 3, 1, 2, 2, 0),
+    # Tests if LIC9 returns FALSE if either the first point or the last point (or both) coincide with the vertex, the
+    # angle is undefined and the LIC is not satisfied by those three points. (either c_pts or d_pts are 0)
+    ([Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(0.0, 0.0), Point2D.Point2D(-1.0, 1.0), Point2D.Point2D(-1.5, -1.0), Point2D.Point2D(0.0, 1.5)], 6, 0, 1, 1.5, 0),
+])
+# Return TRUE if there is at least one set of three data points separated by exactly
+# C_PTS and D_PTS consecutive intervening points, respectively, that form an angle < (PI-Epsilon)
+# or angle > (PI+Epsilon).
+def test_lic9(points, num_points, c_pts, d_pts, epsilon, expected):
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+
+    interceptor_system.parameters.c_pts = c_pts
+    interceptor_system.parameters.d_pts = d_pts
+    interceptor_system.parameters.epsilon = epsilon
+    assert interceptor_system.lic_9() == expected
