@@ -428,3 +428,23 @@ def test_lic14(points, num_points, e_pts, f_pts, area1, area2, expected):
     interceptor_system.parameters.area2 = area2
     assert interceptor_system.lic_14() == expected
 
+# TEST WITHIN CIRCLE METHOD
+@pytest.mark.parametrize("p1,p2,p3,radius,expected", [
+    ##########################  Testing with different sets of three points and radiis  ############################
+    (Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 1.0), 3, 1),
+	(Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 2.0), 0.5, 0),
+	(Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 2.0), 5, 1),
+])
+# Return TRUE if there is at least one set of three data points separated by exactly
+# E PTS and F PTS consecutive intervening points, respectively, that are the vertices
+# of a triangle with area greater than AREA1 and if there is at least one set of
+# three data points separated by exactly E PTS and F PTS consecutive intervening points,
+# respectively, that are the vertices of a triangle with area less than AREA2.
+
+def test_within_circle(p1, p2, p3, radius, expected):
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    interceptor_system = lip.Decide(3, [Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 1.0)], parameters, Con.Connector.ANDD, None)
+    assert interceptor_system.within_circle(p1,p2,p3,radius) == expected
+
+
+
