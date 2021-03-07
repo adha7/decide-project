@@ -327,3 +327,35 @@ def test_lic11(points, num_points, g_pts, expected):
 
     interceptor_system.parameters.g_pts = g_pts
     assert interceptor_system.lic_11() == expected
+
+
+# TEST LIC12
+@pytest.mark.parametrize("points,num_points,k_pts,length1,length2,expected", [
+    ##########################  distance greater than the length1 and less than length2  ############################
+    # Tests if LIC12 returns TRUE if there exist one set of two data points separated by exactly 2
+    # consecutive intervening points , such that distance greater than the length1 and less than length2.
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(2.0, 3.0),Point2D.Point2D(1.0, 6.0), Point2D.Point2D(11.0, 4.0)], 4, 2, 2, 5, 1),
+    ################################  distance greater than the length1 and length2  ################################
+    # Tests if LIC12 returns FALSE if there exist one set of three data points separated by exactly 2
+    # consecutive intervening points , such that distance greater than the length1 and length2.
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(2.0, 3.0),Point2D.Point2D(1.0, 6.0), Point2D.Point2D(11.0, 4.0)], 4, 2, 2, 1, 0),
+    ################################  distance less than the length1 and length2  ################################
+    # Tests if LIC12 returns FALSE if there exist one set of three data points separated by exactly 2
+    # consecutive intervening points , such that distance greater than the length1 and length2.
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(2.0, 3.0),Point2D.Point2D(1.0, 6.0), Point2D.Point2D(11.0, 6.0)], 4, 2, 5, 6, 0),
+    # Tests if the number of points is less than 3
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(13.0, 3.0)], 2, 1, 1, 1, 0),
+])
+# Return TRUE if there is at least one set of two data points separated by exactly
+# K_PTS consecutive intervening points, which are a distance greater than the length,
+# LENGTH1, apart and if there is at least one set of two data points, separated by
+# exactly K_PTS consecutive intervening points, that are a distance less than the
+# length, LENGTH2, apart.
+def test_lic12(points, num_points, k_pts, length1, length2, expected):
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+
+    interceptor_system.parameters.k_pts = k_pts
+    interceptor_system.parameters.length1 = length1
+    interceptor_system.parameters.length2 = length2
+    assert interceptor_system.lic_12() == expected
