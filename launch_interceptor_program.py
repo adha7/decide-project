@@ -380,7 +380,7 @@ class Decide:
             semi_perimeter = (v1Len + v2Len + v3Len) / 2
             area = math.sqrt(
                 semi_perimeter * (semi_perimeter - v1Len) * (semi_perimeter - v2Len) * (semi_perimeter - v3Len))
-
+            print("Area",area)
             if area > self.parameters.area1:
                 return 1
 
@@ -443,21 +443,12 @@ class Decide:
         if self.num_points < 5 or self.parameters.radius2 < 0:
             return 0
 
-        flag1 = 0
-        flag2 = 0
-
         for i in range(self.num_points - self.parameters.a_pts - self.parameters.b_pts - 2):
             p1 = self.points[i]
             p2 = self.points[i + self.parameters.a_pts + 1]
             p3 = self.points[i + self.parameters.a_pts + self.parameters.b_pts + 2]
 
-            if not self.within_circle(p1, p2, p3, self.parameters.radius1):
-                flag1 = 1
-
-            if not self.within_circle(p1, p2, p3, self.parameters.radius2):
-                flag2 = 1
-
-            if flag1 and flag2:
+            if not self.within_circle(p1, p2, p3, self.parameters.radius1) and self.within_circle(p1, p2, p3, self.parameters.radius2):
                 return 1
 
         return 0
