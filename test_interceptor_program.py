@@ -363,16 +363,16 @@ def test_lic12(points, num_points, k_pts, length1, length2, expected):
 
 # TEST LIC13
 @pytest.mark.parametrize("points,num_points,a_pts,b_pts,radius1,radius2,expected", [
-    ##########################  distance greater than the length1 and less than length2  ############################
+    ##########################  cannot be contained in circle of radius1 and can be contained in circle of radius2  ############################
     # Tests if LIC13 returns TRUE if there exist one set of three data points separated by exactly 2 and 1
     # consecutive intervening points , that cannot be contained within or on a circle of radius 0.5 and can be
     # contained within or on a circle of radius 2.
     ([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.5, 0.0), Point2D.Point2D(0.0, 1.5)], 6, 2, 1, 0.5, 2, 1),
-    ################################  distance greater than the length1 and length2  ################################
+    ################################  cannot be contained in circle of radius1 and radius2  ################################
 	# Tests if LIC13 returns FALSE if there exist one set of three data points separated by exactly 2 and 1
 	# consecutive intervening points , that cannot be contained within or on a circle of radius 0.5 and of radius 0.6.
 	([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.5, 0.0), Point2D.Point2D(0.0, 1.5)], 6, 2, 1, 0.5, 0.6, 0),
-	################################  distance less than the length1 and length2  ################################
+	################################  can be contained in circle of radius1 and radius2  ################################
 	# Tests if LIC13 returns FALSE if there exist one set of three data points separated by exactly 2 and 1
 	# consecutive intervening points , that can be contained within or on a circle of radius 2 and of radius 5.
 	([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.5, 0.0), Point2D.Point2D(0.0, 1.5)], 6, 2, 1, 2, 5, 0),
@@ -394,4 +394,37 @@ def test_lic13(points, num_points, a_pts, b_pts, radius1, radius2, expected):
     interceptor_system.parameters.radius1 = radius1
     interceptor_system.parameters.radius2 = radius2
     assert interceptor_system.lic_13() == expected
+
+# TEST LIC14
+@pytest.mark.parametrize("points,num_points,e_pts,f_pts,area1,area2,expected", [
+    ##########################  area greater than the area1 and less than area2  ############################
+    # Tests if LIC13 returns TRUE if there exist one set of three data points separated by exactly 2 and 1
+    # consecutive intervening points , that are the vertices of a triangle with area greater than AREA1 and less than AREA2.
+    ([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.5, 0.0), Point2D.Point2D(0.0, 1.5)], 6, 2, 1, 0.5, 2, 1),
+    ################################  area greater than the area1 and area2  ################################
+	# Tests if LIC13 returns FALSE if there exist one set of three data points separated by exactly 2 and 1
+	# consecutive intervening points , that are the vertices of a triangle with area greater than AREA1 and AREA2.
+	([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.5, 0.0), Point2D.Point2D(0.0, 1.5)], 6, 2, 1, 0.5, 0.6, 0),
+	################################  area less than the area1 and area2  ################################
+	# Tests if LIC13 returns FALSE if there exist one set of three data points separated by exactly 2 and 1
+	# consecutive intervening points , that are the vertices of a triangle with area less than AREA1 and AREA2.
+	([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.5, 0.0), Point2D.Point2D(0.0, 1.5)], 6, 2, 1, 2, 5, 0),
+    # Tests if the number of points is less than 3
+    ([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(1.0, 0.0)], 3, 1, 1, 1, 3, 0),
+])
+# Return TRUE if there is at least one set of three data points separated by exactly
+# E PTS and F PTS consecutive intervening points, respectively, that are the vertices
+# of a triangle with area greater than AREA1 and if there is at least one set of
+# three data points separated by exactly E PTS and F PTS consecutive intervening points,
+# respectively, that are the vertices of a triangle with area less than AREA2.
+
+def test_lic14(points, num_points, e_pts, f_pts, area1, area2, expected):
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+
+    interceptor_system.parameters.e_pts = e_pts
+    interceptor_system.parameters.f_pts = f_pts
+    interceptor_system.parameters.area1 = area1
+    interceptor_system.parameters.area2 = area2
+    assert interceptor_system.lic_14() == expected
 
