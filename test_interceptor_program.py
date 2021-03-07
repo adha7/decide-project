@@ -272,3 +272,34 @@ def test_lic9(points, num_points, c_pts, d_pts, epsilon, expected):
     interceptor_system.parameters.d_pts = d_pts
     interceptor_system.parameters.epsilon = epsilon
     assert interceptor_system.lic_9() == expected
+
+
+# TEST LIC10
+@pytest.mark.parametrize("points,num_points,e_pts,f_pts,area1,expected", [
+    ####################################  AREA OF THE TRIANGLE LESS THAN 8  ###############################
+    # Tests if LIC10 returns TRUE if there exist one set of three data points separated by exactly 1 and 2
+    # consecutive intervening points , that are the vertices of a triangle with area greater than 7 (actual area is 8)
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(2.0, 3.0),Point2D.Point2D(11.0, 6.0), Point2D.Point2D(-1.0, 1.0), Point2D.Point2D(-4.5, -1.0), Point2D.Point2D(13.0, 3.0)], 6, 1, 2, 7, 1),
+    ####################################  AREA OF THE TRIANGLE EQUAL TO 8 ###########################
+    # Tests if LIC10 returns FALSE if there exist one set of three data points separated by exactly 1 and 2
+    # consecutive intervening points , that are the vertices of a triangle with area equal to 8
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(2.0, 3.0),Point2D.Point2D(11.0, 6.0), Point2D.Point2D(-1.0, 1.0), Point2D.Point2D(-4.5, -1.0), Point2D.Point2D(13.0, 3.0)], 6, 1, 2, 8, 0),
+    ####################################  CORNER CONDITIONS/ EXCEPTIONS  ###########################################
+    # Tests if LIC10 returns FALSE if the number of points are less than 5
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(2.0, 3.0),Point2D.Point2D(11.0, 6.0)], 3, 1, 2, 2, 0),
+    ####################################  AREA OF THE TRIANGLE LESS THAN 8 ###########################
+    # Tests if LIC10 returns FALSE if there exist one set of three data points separated by exactly 1 and 2
+    # consecutive intervening points , that are the vertices of a triangle with area less than 9
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(2.0, 3.0),Point2D.Point2D(11.0, 6.0), Point2D.Point2D(-1.0, 1.0), Point2D.Point2D(-4.5, -1.0), Point2D.Point2D(13.0, 3.0)], 6, 1, 2, 9, 0),
+])
+# Return TRUE if there is at least one set of three data points separated by exactly
+# E_PTS and F_PTS consecutive intervening points, respectively, that they are the
+# vertices of a triangle with area greater than AREA1.
+def test_lic10(points, num_points, e_pts, f_pts, area1, expected):
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+
+    interceptor_system.parameters.e_pts = e_pts
+    interceptor_system.parameters.f_pts = f_pts
+    interceptor_system.parameters.area1 = area1
+    assert interceptor_system.lic_10() == expected
