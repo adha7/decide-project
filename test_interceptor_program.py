@@ -448,3 +448,50 @@ def test_within_circle(p1, p2, p3, radius, expected):
 
 
 
+# TEST COMPUTE PUM
+def test_compute_pum():
+    cmv = [1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1]
+    lcm = [[Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+             Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+             [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+             Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+            [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+             Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+             [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+              Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+              [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+              Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+              [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+              Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+              [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+              Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+              [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+              Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+              [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+              Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+              [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+              Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+              [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+              Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+              [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+                                      Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+                                      [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+                                      Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+                                      [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+                                      Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+                                      [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+                                      Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED]]
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    num_points = 5
+    points = [Point2D.Point2D(0.0, 1.0), Point2D.Point2D(1.0, 0.0), Point2D.Point2D(2.0, 0.0),
+              Point2D.Point2D(3.0, 0.0), Point2D.Point2D(3.0, 4.0)]
+
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+
+    interceptor_system.cmv = cmv
+    interceptor_system.lcm = lcm
+    expected = [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1]
+
+    # Testing if all cmv values are correctly set
+    interceptor_system.compute_cmv()
+    assert interceptor_system.pum[0] == expected[0]
