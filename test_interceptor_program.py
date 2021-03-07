@@ -303,3 +303,27 @@ def test_lic10(points, num_points, e_pts, f_pts, area1, expected):
     interceptor_system.parameters.f_pts = f_pts
     interceptor_system.parameters.area1 = area1
     assert interceptor_system.lic_10() == expected
+
+
+# TEST LIC11
+@pytest.mark.parametrize("points,num_points,g_pts,expected", [
+    ####################################  X[j] - X[i] < 0  ###############################
+    # Tests if LIC11 returns TRUE if there exist one set of two data points separated by exactly 1
+    # consecutive intervening points , such that X[j] - X[i] < 0.
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(2.0, 3.0),Point2D.Point2D(1.0, 6.0)], 3, 1, 1),
+    ####################################  X[j] - X[i] > 0 ###########################
+    # Tests if LIC11 returns FALSE if there exist one set of three data points separated by exactly 1 and 2
+    # consecutive intervening points , that are the vertices of a triangle with area equal to 8
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(13.0, 3.0), Point2D.Point2D(11.0, 6.0)], 3, 1, 0),
+    ####################################  CORNER CONDITION ###########################
+    # Tests if the number of points is less than 3
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(13.0, 3.0)], 2, 1, 0),
+])
+# Return TRUE if there is at least one set of two data points separated by exactly
+# G_PTS consecutive intervening points, such that X[j] - X[i] < 0.
+def test_lic11(points, num_points, g_pts, expected):
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+
+    interceptor_system.parameters.g_pts = g_pts
+    assert interceptor_system.lic_11() == expected
