@@ -3,6 +3,7 @@ import Point2D
 import launch_interceptor_program as lip
 import launch_Parameters as Params
 import Connector as Con
+import numpy as np
 
 # Constants
 PI = 3.14
@@ -199,7 +200,7 @@ def test_compute_cmv():
     interceptor_system.parameters.nPTS = 5
     interceptor_system.parameters.dist = 1.5
     interceptor_system.parameters.area2 = 4
-    expected = [True, True, True, True, False, False, False, True, True, True, True, False, False, True, False]
+    expected = [True, True, True, True, False, False, False, True, True, True, True, False, False, False, False]
 
     # Testing if all cmv values are correctly set
     interceptor_system.compute_cmv()
@@ -214,3 +215,320 @@ def test_decide():
     interceptor_system.fuv = [True, True, True, True, True, True, True, True, True, True, True, True, True, True, True]
 
     assert interceptor_system.launch_decision()
+
+# TEST LIC8
+@pytest.mark.parametrize("points,num_points,a_pts,b_pts,radius1,expected", [
+    ####################################  SMALL RADIUS THAT CAN FIT THE DATA POINTS  ###############################
+    # Tests if LIC8 returns TRUE if there exist one set of three data points separated by exactly 2 and 1
+    # consecutive intervening points , that cannot be contained within or on a circle of radius 0.5
+    ([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.5, 0.0), Point2D.Point2D(0.0, 1.5)], 6, 2, 1, 0.5, 1),
+    ####################################  LARGE RADIUS THAT CAN NOT FIT THE DATA POINTS  ###########################
+    # Tests if LIC8 returns FALSE if there exist one set of three data points separated by exactly 2 and 1
+    # consecutive intervening points , that cannot be contained within or on a circle of radius 3
+    ([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.5, 0.0), Point2D.Point2D(0.0, 1.5)], 6, 2, 1, 3, 0),
+    ####################################  CORNER CONDITIONS/ EXCEPTIONS  ###########################################
+    # Tests if LIC8 returns FALSE if the number of points are less than 5
+    ([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0), Point2D.Point2D(0.0, 1.0)], 3, 1, 2, 2, 0),
+    # Tests if LIC8 returns FALSE if there exist one set of three data points separated by exactly 2 and 2 (corner condition)
+    # consecutive intervening points that cannot be contained within or on a circle of radius 0.5
+    ([Point2D.Point2D(-1.0, 0.0), Point2D.Point2D(1.5, 0.5),Point2D.Point2D(1.5, -0.5), Point2D.Point2D(0.0, 1.0), Point2D.Point2D(-1.5, 0.5), Point2D.Point2D(1.0, 0.0)], 6, 2, 2, 0.5, 0),
+])
+# Return TRUE if there is at least one set of three data points separated by exactly
+# A_PTS and B_PTS consecutive intervening points, respectively, that cannot be contained
+# within or on a circle of radius RADIUS1.
+def test_lic8(points, num_points, a_pts, b_pts, radius1, expected):
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+
+    interceptor_system.parameters.a_pts = a_pts
+    interceptor_system.parameters.b_pts = b_pts
+    interceptor_system.parameters.radius1 = radius1
+    assert interceptor_system.lic_8() == expected
+
+# TEST LIC9
+@pytest.mark.parametrize("points,num_points,c_pts,d_pts,epsilon,expected", [
+    ####################################  ANGLE IS LESS THAN PI - EPSILON  ###############################
+    # Tests if LIC9 returns TRUE if there exist one set of three data points separated by exactly 1 and 1
+    # consecutive intervening points , that form an angle such that forms an angle < (PI−1.5)
+    ([Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(0.0, 0.0), Point2D.Point2D(-1.0, 1.0), Point2D.Point2D(-1.5, -1.0), Point2D.Point2D(0.0, 1.5)], 6, 1, 1, 1.5, 1),
+    ####################################  ANGLE IS GREATER THAN PI - EPSILON ###########################
+    # Tests if LIC9 returns FALSE if there exist one set of three data points separated by exactly 2 and 1
+    # consecutive intervening points , that form an angle such that forms an angle > (PI−3.4)
+    ([Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(0.0, 0.0), Point2D.Point2D(-1.0, 1.0), Point2D.Point2D(-1.5, -1.0), Point2D.Point2D(0.0, 1.5)], 6, 2, 1, 3.4, 0),
+    ####################################  CORNER CONDITIONS/ EXCEPTIONS  ###########################################
+    # Tests if LIC9 returns FALSE if the number of points are less than 5
+    ([Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(0.0, 0.0)], 3, 1, 2, 2, 0),
+    # Tests if LIC9 returns FALSE if either the first point or the last point (or both) coincide with the vertex, the
+    # angle is undefined and the LIC is not satisfied by those three points. (either c_pts or d_pts are 0)
+    ([Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(0.0, 0.0), Point2D.Point2D(-1.0, 1.0), Point2D.Point2D(-1.5, -1.0), Point2D.Point2D(0.0, 1.5)], 6, 0, 1, 1.5, 0),
+])
+# Return TRUE if there is at least one set of three data points separated by exactly
+# C_PTS and D_PTS consecutive intervening points, respectively, that form an angle < (PI-Epsilon)
+# or angle > (PI+Epsilon).
+def test_lic9(points, num_points, c_pts, d_pts, epsilon, expected):
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+
+    interceptor_system.parameters.c_pts = c_pts
+    interceptor_system.parameters.d_pts = d_pts
+    interceptor_system.parameters.epsilon = epsilon
+    assert interceptor_system.lic_9() == expected
+
+
+# TEST LIC10
+@pytest.mark.parametrize("points,num_points,e_pts,f_pts,area1,expected", [
+    ####################################  AREA OF THE TRIANGLE LESS THAN 8  ###############################
+    # Tests if LIC10 returns TRUE if there exist one set of three data points separated by exactly 1 and 2
+    # consecutive intervening points , that are the vertices of a triangle with area greater than 7 (actual area is 8)
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(2.0, 3.0),Point2D.Point2D(11.0, 6.0), Point2D.Point2D(-1.0, 1.0), Point2D.Point2D(-4.5, -1.0), Point2D.Point2D(13.0, 3.0)], 6, 1, 2, 7, 1),
+    ####################################  AREA OF THE TRIANGLE EQUAL TO 8 ###########################
+    # Tests if LIC10 returns FALSE if there exist one set of three data points separated by exactly 1 and 2
+    # consecutive intervening points , that are the vertices of a triangle with area equal to 8
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(2.0, 3.0),Point2D.Point2D(11.0, 6.0), Point2D.Point2D(-1.0, 1.0), Point2D.Point2D(-4.5, -1.0), Point2D.Point2D(13.0, 3.0)], 6, 1, 2, 8, 0),
+    ####################################  CORNER CONDITIONS/ EXCEPTIONS  ###########################################
+    # Tests if LIC10 returns FALSE if the number of points are less than 5
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(2.0, 3.0),Point2D.Point2D(11.0, 6.0)], 3, 1, 2, 2, 0),
+    ####################################  AREA OF THE TRIANGLE LESS THAN 8 ###########################
+    # Tests if LIC10 returns FALSE if there exist one set of three data points separated by exactly 1 and 2
+    # consecutive intervening points , that are the vertices of a triangle with area less than 9
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(2.0, 3.0),Point2D.Point2D(11.0, 6.0), Point2D.Point2D(-1.0, 1.0), Point2D.Point2D(-4.5, -1.0), Point2D.Point2D(13.0, 3.0)], 6, 1, 2, 9, 0),
+])
+# Return TRUE if there is at least one set of three data points separated by exactly
+# E_PTS and F_PTS consecutive intervening points, respectively, that they are the
+# vertices of a triangle with area greater than AREA1.
+def test_lic10(points, num_points, e_pts, f_pts, area1, expected):
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+
+    interceptor_system.parameters.e_pts = e_pts
+    interceptor_system.parameters.f_pts = f_pts
+    interceptor_system.parameters.area1 = area1
+    assert interceptor_system.lic_10() == expected
+
+
+# TEST LIC11
+@pytest.mark.parametrize("points,num_points,g_pts,expected", [
+    ####################################  X[j] - X[i] < 0  ###############################
+    # Tests if LIC11 returns TRUE if there exist one set of two data points separated by exactly 1
+    # consecutive intervening points , such that X[j] - X[i] < 0.
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(2.0, 3.0),Point2D.Point2D(1.0, 6.0)], 3, 1, 1),
+    ####################################  X[j] - X[i] > 0 ###########################
+    # Tests if LIC11 returns FALSE if there exist one set of three data points separated by exactly 1 and 2
+    # consecutive intervening points , that are the vertices of a triangle with area equal to 8
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(13.0, 3.0), Point2D.Point2D(11.0, 6.0)], 3, 1, 0),
+    ####################################  CORNER CONDITION ###########################
+    # Tests if the number of points is less than 3
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(13.0, 3.0)], 2, 1, 0),
+])
+# Return TRUE if there is at least one set of two data points separated by exactly
+# G_PTS consecutive intervening points, such that X[j] - X[i] < 0.
+def test_lic11(points, num_points, g_pts, expected):
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+
+    interceptor_system.parameters.g_pts = g_pts
+    assert interceptor_system.lic_11() == expected
+
+
+# TEST LIC12
+@pytest.mark.parametrize("points,num_points,k_pts,length1,length2,expected", [
+    ##########################  distance greater than the length1 and less than length2  ############################
+    # Tests if LIC12 returns TRUE if there exist one set of two data points separated by exactly 2
+    # consecutive intervening points , such that distance greater than the length1 and less than length2.
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(2.0, 3.0),Point2D.Point2D(1.0, 6.0), Point2D.Point2D(11.0, 4.0)], 4, 2, 2, 5, 1),
+    ################################  distance greater than the length1 and length2  ################################
+    # Tests if LIC12 returns FALSE if there exist one set of three data points separated by exactly 2
+    # consecutive intervening points , such that distance greater than the length1 and length2.
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(2.0, 3.0),Point2D.Point2D(1.0, 6.0), Point2D.Point2D(11.0, 4.0)], 4, 2, 2, 1, 0),
+    ################################  distance less than the length1 and length2  ################################
+    # Tests if LIC12 returns FALSE if there exist one set of three data points separated by exactly 2
+    # consecutive intervening points , such that distance greater than the length1 and length2.
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(2.0, 3.0),Point2D.Point2D(1.0, 6.0), Point2D.Point2D(11.0, 6.0)], 4, 2, 5, 6, 0),
+    # Tests if the number of points is less than 3
+    ([Point2D.Point2D(7.0, 4.0), Point2D.Point2D(13.0, 3.0)], 2, 1, 1, 1, 0),
+])
+# Return TRUE if there is at least one set of two data points separated by exactly
+# K_PTS consecutive intervening points, which are a distance greater than the length,
+# LENGTH1, apart and if there is at least one set of two data points, separated by
+# exactly K_PTS consecutive intervening points, that are a distance less than the
+# length, LENGTH2, apart.
+def test_lic12(points, num_points, k_pts, length1, length2, expected):
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+
+    interceptor_system.parameters.k_pts = k_pts
+    interceptor_system.parameters.length1 = length1
+    interceptor_system.parameters.length2 = length2
+    assert interceptor_system.lic_12() == expected
+
+
+# TEST LIC13
+@pytest.mark.parametrize("points,num_points,a_pts,b_pts,radius1,radius2,expected", [
+    ##########################  cannot be contained in circle of radius1 and can be contained in circle of radius2  ############################
+    # Tests if LIC13 returns TRUE if there exist one set of three data points separated by exactly 2 and 1
+    # consecutive intervening points , that cannot be contained within or on a circle of radius 0.5 and can be
+    # contained within or on a circle of radius 2.
+    ([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.5, 0.0), Point2D.Point2D(0.0, 1.5)], 6, 2, 1, 0.5, 2, 1),
+    ################################  cannot be contained in circle of radius1 and radius2  ################################
+	# Tests if LIC13 returns FALSE if there exist one set of three data points separated by exactly 2 and 1
+	# consecutive intervening points , that cannot be contained within or on a circle of radius 0.5 and of radius 0.6.
+	([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.5, 0.0), Point2D.Point2D(0.0, 1.5)], 6, 2, 1, 0.5, 0.6, 0),
+	################################  can be contained in circle of radius1 and radius2  ################################
+	# Tests if LIC13 returns FALSE if there exist one set of three data points separated by exactly 2 and 1
+	# consecutive intervening points , that can be contained within or on a circle of radius 2 and of radius 5.
+	([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.5, 0.0), Point2D.Point2D(0.0, 1.5)], 6, 2, 1, 2, 5, 0),
+    # Tests if the number of points is less than 3
+    ([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(1.0, 0.0)], 3, 1, 1, 1, 3, 0),
+])
+# Return TRUE if there is at least one set of three data points separated by exactly
+# A_PTS and B_PTS consecutive intervening points, respectively, that cannot be
+# contained within or on a circle of radius RADIUS1 and if there is at least one set of
+# three data points separated by exactly A_PTS and B_PTS consecutive intervening points,
+# respectively, that can be contained in or on a circle of radius RADIUS2.
+
+def test_lic13(points, num_points, a_pts, b_pts, radius1, radius2, expected):
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+
+    interceptor_system.parameters.a_pts = a_pts
+    interceptor_system.parameters.b_pts = b_pts
+    interceptor_system.parameters.radius1 = radius1
+    interceptor_system.parameters.radius2 = radius2
+    assert interceptor_system.lic_13() == expected
+
+# TEST LIC14
+@pytest.mark.parametrize("points,num_points,e_pts,f_pts,area1,area2,expected", [
+    ##########################  area greater than the area1 and less than area2  ############################
+    # Tests if LIC13 returns TRUE if there exist one set of three data points separated by exactly 2 and 1
+    # consecutive intervening points , that are the vertices of a triangle with area greater than AREA1 and less than AREA2.
+    ([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.5, 0.0), Point2D.Point2D(0.0, 1.5)], 6, 2, 1, 0.5, 2, 1),
+    ################################  area greater than the area1 and area2  ################################
+	# Tests if LIC13 returns FALSE if there exist one set of three data points separated by exactly 2 and 1
+	# consecutive intervening points , that are the vertices of a triangle with area greater than AREA1 and AREA2.
+	([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.5, 0.0), Point2D.Point2D(0.0, 1.5)], 6, 2, 1, 0.5, 0.6, 0),
+	################################  area less than the area1 and area2  ################################
+	# Tests if LIC13 returns FALSE if there exist one set of three data points separated by exactly 2 and 1
+	# consecutive intervening points , that are the vertices of a triangle with area less than AREA1 and AREA2.
+	([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 1.0), Point2D.Point2D(1.5, 0.0), Point2D.Point2D(0.0, 1.5)], 6, 2, 1, 2, 5, 0),
+    # Tests if the number of points is less than 3
+    ([Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0),Point2D.Point2D(1.0, 0.0)], 3, 1, 1, 1, 3, 0),
+])
+# Return TRUE if there is at least one set of three data points separated by exactly
+# E PTS and F PTS consecutive intervening points, respectively, that are the vertices
+# of a triangle with area greater than AREA1 and if there is at least one set of
+# three data points separated by exactly E PTS and F PTS consecutive intervening points,
+# respectively, that are the vertices of a triangle with area less than AREA2.
+
+def test_lic14(points, num_points, e_pts, f_pts, area1, area2, expected):
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+
+    interceptor_system.parameters.e_pts = e_pts
+    interceptor_system.parameters.f_pts = f_pts
+    interceptor_system.parameters.area1 = area1
+    interceptor_system.parameters.area2 = area2
+    assert interceptor_system.lic_14() == expected
+
+# TEST WITHIN CIRCLE METHOD
+@pytest.mark.parametrize("p1,p2,p3,radius,expected", [
+    ##########################  Testing with different sets of three points and radiis  ############################
+    (Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 1.0), 3, 1),
+	(Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 2.0), 0.5, 0),
+	(Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 2.0), 5, 1),
+])
+# Return TRUE if there is at least one set of three data points separated by exactly
+# E PTS and F PTS consecutive intervening points, respectively, that are the vertices
+# of a triangle with area greater than AREA1 and if there is at least one set of
+# three data points separated by exactly E PTS and F PTS consecutive intervening points,
+# respectively, that are the vertices of a triangle with area less than AREA2.
+
+def test_within_circle(p1, p2, p3, radius, expected):
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    interceptor_system = lip.Decide(3, [Point2D.Point2D(0.0, 0.0), Point2D.Point2D(1.0, 0.0), Point2D.Point2D(1.0, 1.0)], parameters, Con.Connector.ANDD, None)
+    assert interceptor_system.within_circle(p1,p2,p3,radius) == expected
+
+
+
+# TEST COMPUTE PUM
+def test_compute_pum():
+    cmv = [1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1]
+    lcm = [[Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+             Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+             [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+             Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+            [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+             Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+             [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+              Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+              [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+              Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+              [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+              Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+              [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+              Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+              [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+              Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+              [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+              Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+              [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+              Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+              [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+              Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+              [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+                                      Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+                                      [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+                                      Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+                                      [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+                                      Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED],
+                                      [Con.Connector.ANDD, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR,
+                                      Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.ANDD, Con.Connector.ORR, Con.Connector.ANDD, Con.Connector.NOTUSED, Con.Connector.NOTUSED, Con.Connector.NOTUSED]]
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    num_points = 5
+    points = [Point2D.Point2D(0.0, 1.0), Point2D.Point2D(1.0, 0.0), Point2D.Point2D(2.0, 0.0),
+              Point2D.Point2D(3.0, 0.0), Point2D.Point2D(3.0, 4.0)]
+
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+
+    interceptor_system.cmv = cmv
+    interceptor_system.lcm = lcm
+    expected = [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1]
+
+    # Testing if a pum value is correctly set
+    interceptor_system.compute_cmv()
+    assert interceptor_system.pum[0] == expected[0]
+
+
+# TEST COMPUTE FUV
+def test_compute_fuv():
+    # Creates a boolean array of length 15, The element FUV[i] is 1 if:
+    # --- PUV[i] is 0
+    # --- all elements in PUM are true
+
+    parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
+    num_points = 1
+    points = [Point2D.Point2D(0.0, 1.0)]
+
+
+    interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
+
+    interceptor_system.puv = [1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 1]
+    interceptor_system.pum = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
+    expected = [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1]
+
+    # Testing if an fuv value is correctly set
+    interceptor_system.compute_fuv()
+    assert interceptor_system.fuv[0] == expected[0]
