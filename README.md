@@ -9,7 +9,7 @@ The input radar tracking information is provided when an object of Decide() clas
 
 
 # Requirements
-* Pyhton 3.8
+* Python 3.8
 * Pytest 6.2.2
 
 
