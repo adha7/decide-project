@@ -13,7 +13,7 @@ The input radar tracking information is provided when an object of Decide() clas
 * Pytest 6.2.2
 
 
-# Running the test suite
+# Running the Test Suite
 With the *pytest* package, tests can be executed with a simple command:
 `<$ pytest>`
 
@@ -28,7 +28,7 @@ Additionaly, you can run a specific test file by giving its name as an argument.
 	* Worked on creating the skeleton for the project.
 	* Helped creating helper classes
 	* Implemented the requirements of LIC 0 - LIC 7.
-	* Implemented unit tests for methods in the Decide class: LIC 0 - LIC 7, Decide and ComputeCMV
+	* Implemented unit tests for methods in the Decide class: LIC 0 - LIC 7, launch_decision and compute_CMV
 	* Helped writing the README file
 
 * Momina Rizwan
