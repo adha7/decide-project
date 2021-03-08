@@ -61,13 +61,10 @@ Additionaly, you can run a specific test file by giving its name as an argument.
 	* Worked on creating the skeleton for the project.
 	* Helped creating helper classes.
 	* Implemented the requirements of LIC 0 - LIC 7.
-<<<<<<< HEAD
 	* Implemented unit tests for methods in the Decide class: LIC 0 - LIC 7, Decide and ComputeCMV.
 	* Helped writing the README file.
-=======
 	* Implemented unit tests for methods in the Decide class: LIC 0 - LIC 7, launch_decision and compute_CMV
 	* Helped writing the README file
->>>>>>> 286315fc1b6eceedbbbe3ff60794b2432b22e0dc
 
 * Momina Rizwan
 	* Helped creating helper classes (Point2D, Parameters and Connector class).
