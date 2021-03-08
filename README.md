@@ -19,9 +19,9 @@ With the *pytest* package, tests can be executed with a simple command:
 
 With no arguments, pytest looks at the current working directory (or some other preconfigured directory) and all subdirectories for test files and runs the test code it finds.
 
-Additionalz, you can run a specific test file by giving its name as an argument.
+Additionaly, you can run a specific test file by giving its name as an argument.
 
-$ pytest test_interceptor_program.py::lic_1
+`<$ pytest test_interceptor_program.py::lic_1>`
 
 # Contributors
 * Adha Hrusto
