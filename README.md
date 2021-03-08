@@ -21,7 +21,7 @@ With no arguments, pytest looks at the current working directory (or some other 
 
 Additionaly, you can run a specific test file by giving its name as an argument.
 
-`<$ pytest test_interceptor_program.py::lic_1>`
+`<$ pytest test_interceptor_program.py::test_lic1>`
 
 # Contributors
 * Adha Hrusto
