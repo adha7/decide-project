@@ -3,6 +3,7 @@ import math
 import launch_Parameters as Params
 import Connector as Con
 import Point2D
+import Vector as Vec
 
 # Constants
 PI = 3.14
@@ -120,12 +121,12 @@ class Decide:
             p3 = self.points[i + 2]
 
             # Calculate the two vectors using point 2 as vertex
-            vector1 = (p1.x - p2.x, p1.y - p2.y)
-            vector2 = (p3.x - p2.x, p3.y - p2.y)
+            vector1 = Vec.Vector(p2, p1)
+            vector2 = Vec.Vector(p2, p3)
 
-            dotProduct = vector1[0] * vector2[0] + vector1[1] * vector2[1]
-            vector1Len = math.sqrt(math.pow(vector1[0], 2) + math.pow(vector1[1], 2))
-            vector2Len = math.sqrt(math.pow(vector2[0], 2) + math.pow(vector2[1], 2))
+            dotProduct = vector1.x * vector2.x + vector1.y * vector2.y
+            vector1Len = math.sqrt(math.pow(vector1.x, 2) + math.pow(vector1.y, 2))
+            vector2Len = math.sqrt(math.pow(vector2.x, 2) + math.pow(vector2.y, 2))
 
             # If any two points coincide then move on
             if vector1Len == 0 or vector2Len == 0:
