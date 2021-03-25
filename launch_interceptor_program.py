@@ -74,7 +74,7 @@ class Decide:
             # Calculate the distance between point p1 and p2
             p1 = self.points[i]
             p2 = self.points[i + 1]
-            distance = math.sqrt(math.pow(p2.x - p1.x, 2) + math.pow(p2.y - p1.y, 2))
+            distance = self.calculate_distance(p2, p1)
 
             # Check if the distance is greater than length1 in the parameters
             if distance > self.parameters.length1:
@@ -96,9 +96,9 @@ class Decide:
             p2 = self.points[i + 1]
             p3 = self.points[i + 2]
 
-            length_p12 = math.sqrt(math.pow(p1.x - p2.x, 2) + math.pow(p1.y - p2.y, 2))
-            length_p13 = math.sqrt(math.pow(p1.x - p3.x, 2) + math.pow(p1.y - p3.y, 2))
-            length_p23 = math.sqrt(math.pow(p2.x - p3.x, 2) + math.pow(p2.y - p3.y, 2))
+            length_p12 = self.calculate_distance(p1, p2)
+            length_p13 = self.calculate_distance(p1, p3)
+            length_p23 = self.calculate_distance(p2, p3)
 
             # Calculating the radius of the circumcircle
             multipliedLengths = length_p12 * length_p13 * length_p23
@@ -110,6 +110,10 @@ class Decide:
             if radius > self.parameters.radius1:
                 return 1
         return 0
+
+    def calculate_distance(self, point_1, point_2):
+        length = math.sqrt(math.pow(point_1.x - point_2.x, 2) + math.pow(point_1.y - point_2.y, 2))
+        return length
 
     # Return TRUE if three consecutive points form an angle greater than PI+epsilon or less than PI-epsilon
     def lic_2(self):
@@ -162,9 +166,9 @@ class Decide:
             p3 = self.points[i + 2]
 
             # Calculate the sides of the triangle
-            length1 = math.sqrt(math.pow(p1.x - p2.x, 2) + math.pow(p1.y - p2.y, 2))
-            length2 = math.sqrt(math.pow(p1.x - p3.x, 2) + math.pow(p1.y - p3.y, 2))
-            length3 = math.sqrt(math.pow(p2.x - p3.x, 2) + math.pow(p2.y - p3.y, 2))
+            length1 = self.calculate_distance(p1, p2)
+            length2 = self.calculate_distance(p1, p3)
+            length3 = self.calculate_distance(p2, p3)
 
             # Calculate the area of the triangle using Heron's formula
             tmp = (length1 + length2 + length3) / 2
@@ -286,7 +290,7 @@ class Decide:
             p2 = self.points[i + 1 + self.parameters.k_pts]
 
             # Calculate the distance between the two points
-            distance = math.sqrt(math.pow(p2.x - p1.x, 2) + math.pow(p2.y - p1.y, 2))
+            distance = self.calculate_distance(p2, p1)
 
             if distance > self.parameters.length1:
                 return 1
@@ -422,7 +426,7 @@ class Decide:
             p2 = self.points[i + self.parameters.k_pts + 1]
 
             # Calculate the distance between two points
-            dist = math.sqrt(math.pow(p2.x - p1.x, 2) + math.pow(p2.y - p1.y, 2))
+            dist = self.calculate_distance(p2, p1)
 
             if dist > self.parameters.length1:
                 flag1 = 1
@@ -474,9 +478,9 @@ class Decide:
             p3 = self.points[i + self.parameters.e_pts + self.parameters.f_pts + 2]
 
             # Calculating the length of sides of the triangle
-            v1Len = math.sqrt(math.pow(p1.x - p2.x, 2) + math.pow(p1.y - p2.y, 2))
-            v2Len = math.sqrt(math.pow(p1.x - p3.x, 2) + math.pow(p1.y - p3.y, 2))
-            v3Len = math.sqrt(math.pow(p2.x - p3.x, 2) + math.pow(p2.y - p3.y, 2))
+            v1Len = self.calculate_distance(p1, p2)
+            v2Len = self.calculate_distance(p1, p3)
+            v3Len = self.calculate_distance(p2, p3)
 
             # Calculating the are of the triangle 
             semi_perimeter = (v1Len + v2Len + v3Len) / 2
