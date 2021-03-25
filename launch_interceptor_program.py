@@ -16,9 +16,9 @@ class Decide:
         self.parameters = parameters
         self.lcm = lcm
         self.puv = puv
-        self.cmv = np.zeros(15)              # The Conditions Met Vector (CMV), a 15-element vector.
+        self.cmv = np.zeros(15)  # The Conditions Met Vector (CMV), a 15-element vector.
         self.pum = np.array([15, 15], bool)  # Preliminary Unlocking Matrix (PUM), a 15x15 matrix.
-        self.fuv = np.zeros(15)              # The Final Unlocking Vector (FUV), a 15-element vector.
+        self.fuv = np.zeros(15)  # The Final Unlocking Vector (FUV), a 15-element vector.
 
     def launch_decision(self):
         for count, value in enumerate(self.fuv):
@@ -58,7 +58,7 @@ class Decide:
     def compute_fuv(self):
         fuv_length = len(self.fuv)
         for i in range(0, fuv_length):
-            if not(self.puv[i]) or sum(self.pum[i]) == len(self.pum[i]):
+            if not (self.puv[i]) or sum(self.pum[i]) == len(self.pum[i]):
                 self.fuv[i] = True
             else:
                 self.fuv[i] = False
@@ -191,28 +191,32 @@ class Decide:
                 cons_points.append(self.points[j])
 
             # Keep track of visited quadrants
-            num_quads = [False, False, False, False]
+            quadrants_status = [False, False, False, False]
 
             for count, point in enumerate(cons_points):
-                if point.x >= 0:
-                    if point.y >= 0:
-                        num_quads[0] = 1
-                    elif point.x == 0 and point.y < 0:
-                        num_quads[2] = 1
-                    else:
-                        num_quads[3] = 1
-
-                else:
-                    if point.y >= 0:
-                        num_quads[1] = 1
-                    else:
-                        num_quads[2] = 1
+                quadrants_status = self.check_quadrants(point, quadrants_status)
 
             # Check if the set of q_pts consecutive points lie in more than q_uads quadrants
-            if sum(num_quads) > self.parameters.q_uads:
+            if sum(quadrants_status) > self.parameters.q_uads:
                 return 1
 
         return 0
+
+    def check_quadrants(self, point, visited_quadrants):
+        if point.x >= 0:
+            if point.y >= 0:
+                visited_quadrants[0] = 1
+            elif point.x == 0 and point.y < 0:
+                visited_quadrants[2] = 1
+            else:
+                visited_quadrants[3] = 1
+
+        else:
+            if point.y >= 0:
+                visited_quadrants[1] = 1
+            else:
+                visited_quadrants[2] = 1
+        return visited_quadrants
 
     # Return TRUE if there exists at least one set of two consecutive data points where X[j] - X[i] < 0 (where i=j-1)
     def lic_5(self):
@@ -377,7 +381,7 @@ class Decide:
             semi_perimeter = (v1Len + v2Len + v3Len) / 2
             area = math.sqrt(
                 semi_perimeter * (semi_perimeter - v1Len) * (semi_perimeter - v2Len) * (semi_perimeter - v3Len))
-            print("Area",area)
+            print("Area", area)
             if area > self.parameters.area1:
                 return 1
 
@@ -440,7 +444,8 @@ class Decide:
             p2 = self.points[i + self.parameters.a_pts + 1]
             p3 = self.points[i + self.parameters.a_pts + self.parameters.b_pts + 2]
 
-            if not self.within_circle(p1, p2, p3, self.parameters.radius1) and self.within_circle(p1, p2, p3, self.parameters.radius2):
+            if not self.within_circle(p1, p2, p3, self.parameters.radius1) and self.within_circle(p1, p2, p3,
+                                                                                                  self.parameters.radius2):
                 return 1
 
         return 0
@@ -498,7 +503,7 @@ class Decide:
         # Calculating the radius if the circumcircle
         numerator = dist12 * dist23 * dist31
         denominator = (dist12 + dist31 + dist23) * (- dist12 + dist23 + dist31) * (dist12 - dist23 + dist31) * (
-                    dist12 + dist23 - dist31)
+                dist12 + dist23 - dist31)
         # Making sure that the denominator is not zero
         if denominator == 0:
             return 0
