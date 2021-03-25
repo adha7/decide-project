@@ -96,20 +96,10 @@ class Decide:
             p2 = self.points[i + 1]
             p3 = self.points[i + 2]
 
-            length_p12 = self.calculate_distance(p1, p2)
-            length_p13 = self.calculate_distance(p1, p3)
-            length_p23 = self.calculate_distance(p2, p3)
-
-            # Calculating the radius of the circumcircle
-            multipliedLengths = length_p12 * length_p13 * length_p23
-            multipliedLengthDiffs = (length_p12 + length_p13 + length_p23) * (length_p12 + length_p13 - length_p23) * \
-                                    (length_p13 + length_p23 - length_p12) * (length_p23 + length_p12 - length_p13)
-            radius = multipliedLengths / math.sqrt(multipliedLengthDiffs)
-
             # Check if points b or c is inside or on the radius radius1 away from a
-            if radius > self.parameters.radius1:
-                return 1
-        return 0
+            if self.within_circle(p1, p2, p3, self.parameters.radius1):
+                return 0
+        return 1
 
     def calculate_distance(self, point_1, point_2):
         length = math.sqrt(math.pow(point_1.x - point_2.x, 2) + math.pow(point_1.y - point_2.y, 2))
