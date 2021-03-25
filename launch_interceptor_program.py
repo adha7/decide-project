@@ -409,25 +409,20 @@ class Decide:
         if self.num_points < 3 or self.parameters.length2 < 0:
             return 0
 
-        flag1 = 0
-        flag2 = 0
-
         for i in range(self.num_points - self.parameters.k_pts - 1):
             p1 = self.points[i]
             p2 = self.points[i + self.parameters.k_pts + 1]
 
             # Calculate the distance between two points
             dist = self.calculate_distance(p2, p1)
-
-            if dist > self.parameters.length1:
-                flag1 = 1
-
-            if dist < self.parameters.length2:
-                flag2 = 1
-
-            if flag1 and flag2:
+            if self.check_distance(dist):
                 return 1
 
+        return 0
+
+    def check_distance(self, distance):
+        if self.parameters.length1 < distance < self.parameters.length2:
+            return 1
         return 0
 
     # Return TRUE if there is at least one set of three data points separated by exactly

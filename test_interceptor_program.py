@@ -68,7 +68,7 @@ def test_lic2(epsilon, expected):
     interceptor_system = lip.Decide(num_points, points, parameters, Con.Connector.ANDD, None)
 
     interceptor_system.parameters.epsilon = epsilon
-    assert interceptor_system.lic_2() == expected
+    assert interceptor_system.lic_2(0, PI) == expected
 
 
 # TEST LIC3
