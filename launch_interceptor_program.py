@@ -171,16 +171,16 @@ class Decide:
 
         return 0
 
+    def verify_parameter(self, parameter, lower_limit, upper_limit):
+        if parameter > upper_limit or parameter < lower_limit:
+            return 0
+
     # Return TRUE if there exists at least one set of Q_PTS consecutive data points that lie in more than QUADS
     # quadrants.                       2 <= Q_PTS <= NUMPOINTS, 1 <= QUADS <= 3
     def lic_4(self):
 
         # Check the boundaries
-        if self.parameters.q_pts > self.num_points or self.parameters.q_pts < 2:
-            return 0
-
-        # Check the boundaries
-        if self.parameters.q_uads > 3 or self.parameters.q_uads < 1:
+        if self.verify_parameter(self.parameters.q_pts, 2, self.num_points) or self.verify_parameter(self.parameters.q_uads, 1, 3):
             return 0
 
         # Iterate over all sets of qPts consecutive points
