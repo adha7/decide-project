@@ -44,8 +44,9 @@ class Decide:
         self.cmv[14] = self.lic_14()
 
     def compute_pum(self):
-        for i in range(0, 15):
-            for j in range(0, 15):
+        pum_rows, pum_columns = self.pum.shape
+        for i in range(0, pum_rows):
+            for j in range(0, pum_columns):
                 if self.lcm[i][j] == Con.Connector.ANDD:
                     self.pum[i][j] = self.cmv[i] and self.cmv[j]
                 elif self.lcm[i][j] == Con.Connector.ORR:
@@ -54,7 +55,8 @@ class Decide:
                     self.pum[i][j] = 1
 
     def compute_fuv(self):
-        for i in range(0, 15):
+        fuv_length = len(self.fuv)
+        for i in range(0, fuv_length):
             if not(self.puv[i]) or sum(self.pum[i]) == len(self.pum[i]):
                 self.fuv[i] = True
             else:
