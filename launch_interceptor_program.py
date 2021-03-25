@@ -11,6 +11,7 @@ PI = 3.14
 
 class Decide:
     def __init__(self, num_points, points: Point2D, parameters: Params.Parameters, lcm: Con.Connector, puv):
+        assert num_points > 0, 'Number of points should be greater than zero!'
         self.num_points = num_points
         self.points = points
         self.parameters = parameters

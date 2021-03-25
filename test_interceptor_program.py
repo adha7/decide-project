@@ -211,7 +211,7 @@ def test_compute_cmv():
 # Testing if Decide() returns TRUE if all values in FUV are true, false otherwise
 def test_decide():
     parameters = Params.Parameters(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
-    interceptor_system = lip.Decide(0, None, parameters, Con.Connector.ANDD, None)
+    interceptor_system = lip.Decide(1, None, parameters, Con.Connector.ANDD, None)
     interceptor_system.fuv = [True, True, True, True, True, True, True, True, True, True, True, True, True, True, True]
 
     assert interceptor_system.launch_decision()
