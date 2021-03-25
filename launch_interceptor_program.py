@@ -30,7 +30,7 @@ class Decide:
     def compute_cmv(self):
         self.cmv[0] = self.lic_0()
         self.cmv[1] = self.lic_1()
-        self.cmv[2] = self.lic_2()
+        self.cmv[2] = self.lic_2(0, PI)
         self.cmv[3] = self.lic_3()
         self.cmv[4] = self.lic_4()
         self.cmv[5] = self.lic_5()
@@ -107,10 +107,10 @@ class Decide:
         return length
 
     # Return TRUE if three consecutive points form an angle greater than PI+epsilon or less than PI-epsilon
-    def lic_2(self):
+    def lic_2(self, lower_limit, upper_limit):
 
         # Check the boundaries
-        if self.parameters.epsilon < 0 or self.parameters.epsilon >= PI:
+        if self.parameters.epsilon < lower_limit or self.parameters.epsilon >= upper_limit:
             return 0
 
         # Iterate over all sets of three consecutive points
