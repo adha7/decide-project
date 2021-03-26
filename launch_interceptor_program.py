@@ -369,24 +369,27 @@ class Decide:
             p3 = self.points[i + self.parameters.e_pts + self.parameters.f_pts + 2]
 
             # Finding the vectors to create an triangle
-            v1 = (p1.x - p2.x, p1.y - p2.y)
-            v2 = (p3.x - p1.x, p3.y - p1.y)
-            v3 = (p2.x - p3.x, p2.y - p3.y)
+            v1 = Vec.Vector(p1, p2)
+            v2 = Vec.Vector(p1, p3)
+            v3 = Vec.Vector(p3, p2)
 
-            # Calculating the length of sides of the triangle
-            v1Len = math.sqrt(math.pow(v1[0], 2) + math.pow(v1[1], 2))
-            v2Len = math.sqrt(math.pow(v2[0], 2) + math.pow(v2[1], 2))
-            v3Len = math.sqrt(math.pow(v3[0], 2) + math.pow(v3[1], 2))
-
-            # Calculating the are of the triangle 
-            semi_perimeter = (v1Len + v2Len + v3Len) / 2
-            area = math.sqrt(
-                semi_perimeter * (semi_perimeter - v1Len) * (semi_perimeter - v2Len) * (semi_perimeter - v3Len))
-            print("Area", area)
+            area = self.calculate_triangle_area(v1, v2, v3)
             if area > self.parameters.area1:
                 return 1
 
         return 0
+
+    def calculate_triangle_area(self, v1, v2, v3):
+        # Calculating the length of sides of the triangle
+        v1Len = math.sqrt(math.pow(v1.x, 2) + math.pow(v1.y, 2))
+        v2Len = math.sqrt(math.pow(v2.x, 2) + math.pow(v2.y, 2))
+        v3Len = math.sqrt(math.pow(v3.x, 2) + math.pow(v3.y, 2))
+        # Calculating the are of the triangle
+        semi_perimeter = (v1Len + v2Len + v3Len) / 2
+        area = math.sqrt(
+            semi_perimeter * (semi_perimeter - v1Len) * (semi_perimeter - v2Len) * (semi_perimeter - v3Len))
+        print("Area", area)
+        return area
 
     # Return TRUE if there is at least one set of two data points separated by exactly
     # G_PTS consecutive intervening points, such that X[j] - X[i] < 0.
